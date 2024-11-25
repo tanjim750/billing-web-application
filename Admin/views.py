@@ -1,3 +1,4 @@
+from typing import Any
 from django.shortcuts import render
 from django.views import View
 from . import models
@@ -23,8 +24,6 @@ class NewBooking(View):
         monthly_rent = request.POST.get('monthly_rent', None)
         advance_payment = request.POST.get('advance_payment', None)
         advance_payment_date = request.POST.get('advance_payment_date', None)
-        
-        print("advance payment date: ",advance_payment_date)
         context = {}
 
         try:
@@ -53,5 +52,80 @@ class NewBooking(View):
             context['error'] = str(e)
             return JsonResponse(context, status=501)
 
-            
 
+class Customer(View):
+    def __init__(self) -> None:
+        self.customers = models.Customer.objects.all()
+        self.context = {
+        }
+
+    def get(self, request, *args, **kwargs):
+        self.context["customers"] = self.customers
+        return render(request, 'admin/customer.html', context=self.context)  
+    
+    def post(self, request, *args, **kwargs):
+        name = request.POST.get('name', None)
+        email = request.POST.get('email', None)
+        number = request.POST.get('number', None)
+        nid = request.POST.get('nid', None)
+        address = request.POST.get('address', None)
+
+        try:
+            if name and number and address:
+                customer = models.Customer.objects.create(
+                    name=name, 
+                    email=email, 
+                    nid=nid, 
+                    address=address, 
+                    number = number
+                    )
+                customer.save()
+
+                # self.context['customers'] = models.Customer.objects.all()
+                self.context['status'] = 200
+                self.context['message'] = 'Successfully created new customer.'
+                return JsonResponse(self.context, status=200)
+            else:
+                self.context['status'] = 400
+                self.context['message'] = 'Missing required parameters'
+                return JsonResponse(self.context, status=400)
+            
+        except Exception as e:
+            self.context['status'] = 501
+            self.context['message'] = 'Internal Server Error'
+            self.context['error'] = str(e)
+            return JsonResponse(self.context, status=501)
+        
+    def put(self, request, *args, **kwargs):
+        id = request.GET.get('id', None)
+        name = request.POST.get('name', None)
+        email = request.POST.get('email', None)
+        number = request.POST.get('number', None)
+        nid = request.POST.get('nid', None)
+        address = request.POST.get('address', None)
+
+        try:
+            if id and name and number and address:
+                customer = models.Customer.objects.create(
+                    name=name, 
+                    email=email, 
+                    nid=nid, 
+                    address=address, 
+                    number = number
+                    )
+                customer.save()
+
+                # self.context['customers'] = models.Customer.objects.all()
+                self.context['status'] = 200
+                self.context['message'] = 'Successfully created new customer.'
+                return JsonResponse(self.context, status=200)
+            else:
+                self.context['status'] = 400
+                self.context['message'] = 'Missing required parameters'
+                return JsonResponse(self.context, status=400)
+            
+        except Exception as e:
+            self.context['status'] = 501
+            self.context['message'] = 'Internal Server Error'
+            self.context['error'] = str(e)
+            return JsonResponse(self.context, status=501)

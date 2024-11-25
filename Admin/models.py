@@ -5,6 +5,7 @@ class Customer(models.Model):
     number = models.CharField(max_length=20)
     email = models.EmailField(max_length=100 , blank=True, null=True)
     address = models.TextField()
+    nid = models.CharField(max_length=100, blank=True, null=True)
 
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
