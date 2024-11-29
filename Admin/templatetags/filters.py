@@ -14,8 +14,9 @@ def get_booking_payment_due(booking: Booking, is_status = False):
     total_paid = booking.total_paid
     rent_start = booking.rent_start_date
     monthly_rent = booking.monthly_rent
+    end_date = booking.end_date
 
-    crnt_date = datetime.now().date()
+    crnt_date = end_date.date() if end_date else datetime.now().date()
     date_diff = relativedelta(crnt_date,rent_start.date())
 
     total_months = date_diff.years * 12 + date_diff.months
@@ -44,8 +45,9 @@ def get_advance_rent(booking: Booking):
     total_paid = booking.total_paid
     rent_start = booking.rent_start_date
     monthly_rent = booking.monthly_rent
+    end_date = booking.end_date
 
-    crnt_date = datetime.now().date()
+    crnt_date = end_date.date() if end_date else datetime.now().date()
     date_diff = relativedelta(crnt_date,rent_start.date())
 
     total_months = date_diff.years * 12 + date_diff.months

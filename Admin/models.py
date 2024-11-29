@@ -23,6 +23,8 @@ class Booking(models.Model):
     total_paid = models.FloatField(default=0)
     last_payment_date = models.DateTimeField(null=True, blank=True)
     rent_start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    is_ended = models.BooleanField(default=False)
 
     date_created = models.DateTimeField(auto_now_add=True)
 

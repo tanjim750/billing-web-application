@@ -8,6 +8,7 @@ from django.core.serializers import serialize
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
+import json
 from icecream import ic
 
 class SalesListView(View):
@@ -19,11 +20,20 @@ class SalesListView(View):
         }
 
     def get(self, request, *args, **kwargs):
+        id = request.GET.get('booking', None)
+        if(id is not None):
+            get_booking = models.Booking.objects.filter(id=id)
+            if(get_booking):
+                return JsonResponse(list(get_booking.values()),safe=False)
+            else:
+                return JsonResponse({"satus":400,"error":"Booking not found"}, status=400)
+        
         self.context['bookings'] = self.bookings
 
         return render(request, 'Admin/sales-list.html', context=self.context,status=200)
     
-class NewBooking(View):
+
+class Booking(View):
     def post(self, request, *args, **kwargs):
         customer_id = request.POST.get('customer_id', None)
         shop = request.POST.get('shop', None)
@@ -67,6 +77,88 @@ class NewBooking(View):
             context['message'] = 'Internal Server Error'
             context['error'] = str(e)
             return JsonResponse(context, status=501)
+        
+    def put(self,request):
+        body = json.loads(request.body.decode('utf-8'))
+        
+        booking_id = body.get('booking_id',None)
+        advance_payment = body.get('advance_pay',None)
+        advance_payment_date = body.get('advance_payment_date',None)
+        end_date = body.get('end_date',None)
+        is_ended = False if body.get('is_ended') else True
+        last_payment_date = body.get('last_pay',None)
+        monthly_rent = body.get('monthly_rent',None)
+        rent_start_date = body.get('start_date',None)
+        total_paid = body.get('total_paid',None)
+
+        try:
+            if (booking_id and advance_payment 
+                    and monthly_rent and 
+                    total_paid and rent_start_date):
+                booking = models.Booking.objects.filter(id=booking_id).first()
+
+                if (booking is None):
+                    context = {
+                        "status": 400,
+                        "message": "Booking not found"
+                    }
+                    return JsonResponse(context,status=400)
+                
+                
+
+                # formate date
+                start_date = datetime.strptime(rent_start_date,"%d-%m-%Y")
+                start_date = start_date.strftime("%Y-%m-%d")
+                advance_date = datetime.strptime(advance_payment_date,"%d-%m-%Y") if advance_payment_date else None
+                advance_date = advance_date.strftime("%Y-%m-%d") if advance_date else None
+                pay_date = datetime.strptime(last_payment_date,"%d-%m-%Y") if last_payment_date else None
+                pay_date = pay_date.strftime("%Y-%m-%d") if pay_date else None
+                rent_end_date = datetime.strptime(end_date, "%d-%m-%Y") if end_date else None
+                rent_end_date = rent_end_date.strftime("%Y-%m-%d") if rent_end_date else None
+                
+                booking.advance_payment = advance_payment
+                booking.monthly_rent = monthly_rent
+                booking.total_paid = total_paid
+                booking.rent_start_date = start_date
+                booking.advance_payment_date = advance_date
+                booking.last_payment_date = pay_date
+                booking.is_ended = True if is_ended else False
+                booking.end_date = rent_end_date if rent_end_date and is_ended else None
+
+                ic(end_date, rent_end_date, is_ended)
+                if (is_ended and rent_end_date is None) or (rent_end_date and is_ended is False):
+                    context= {
+                        "status": 400,
+                        "message": "Required end date and must be inactivated"
+                    }
+                    return JsonResponse(context,status=400)
+
+                booking.save()
+
+                context = {
+                    "status": 200,
+                    "message": "Booking Successfully Updated"
+                }
+
+                return JsonResponse(context,status=200)
+            else:
+                context = {
+                    "status":400,
+                    "message": "Missing required fields"
+                }
+                return JsonResponse(context,status=400)
+            
+        except Exception as e:
+            
+            context = {
+                    "status":501,
+                    "message": "Internal Server Error",
+                    "error": str(e)
+                }
+            ic(context)
+            return JsonResponse(context,status=501)
+        
+        
 
 class MakePayment(View):
     def __init__(self) -> None:

@@ -115,7 +115,7 @@
                 <table class="table  datanew">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Activity</th>
                             <th>Customer Name</th>
                             <th>Shop</th>
                             <th>Start Date</th>
@@ -140,7 +140,15 @@
                             <input type="hidden" name="address" value="{{booking.customer.address}}">
                             <input type="hidden" name="status" value="{{booking|total_due:True}}">
 
-                            <td>#{{booking.customer.id}}</td>
+                            <td style="display: flex;">
+                                
+                                {% if booking.is_ended %}
+                                    <div style="margin-top: 5px; height: 10px; width: 10px; border-radius: 50%; background-color: red;"></div>
+                                {% else %}
+                                    <div style="margin-top: 5px; height: 10px; width: 10px; border-radius: 50%; background-color: green;"></div>
+                                {% endif %}
+                                &nbsp;&nbsp;#{{booking.customer.id}}
+                            </td>
                             <td>{{booking.customer.name}}</td>
                             <td>{{booking.shop}}</td>
                             <td>{{booking.rent_start_date|date:"d M Y"}}</td>
@@ -291,6 +299,144 @@
                 
                 //details_table.replaceChildren();
             }
+            //event.target.click();
+        })
+    });
+
+
+    // customer activities controller
+    function toggleActicvity(event){
+        let is_checked = event.checked;
+        let toogle = event.parentNode.querySelector(".customer-toggle");
+        let form = event.parentNode.parentNode.parentNode.parentNode.parentNode;
+
+        console.log(toogle);
+
+        if(is_checked){
+            toogle.textContent = "Active";
+            toogle.style.color = "#046b06";
+            form.querySelector('input[name=end_date]').disabled = true;
+            form.querySelector('input[name=end_date]').value = "";
+        }else{
+            toogle.textContent = "Inactive";
+            toogle.style.color = "red";
+            form.querySelector('input[name=end_date]').disabled = false;
+            
+        }
+    }
+
+    // edit booking details
+    edit_form = document.querySelector('form[id=edit-booking]')
+    let message = edit_form.querySelector('#message');
+
+    edit_form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        let csrfToken = edit_form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        let formData = new FormData(edit_form);
+        let jsonData = Object.fromEntries(formData.entries());
+
+        try{
+            let response = await fetch("{% url 'new-booking' %}",{
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json', 
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify(jsonData)
+            })
+    
+    
+            let json = await response.json();
+            let responseMessage = json.message;
+            message.textContent = responseMessage;
+            
+            if(response.ok){
+                message.style.color = "green";
+            }else{
+                message.style.color = "red";
+            }
+
+        }catch{
+            message.textContent = "Something went wrong. Please try again";
+            message.style.color = "red";
+        }
+
+        setTimeout(function(){
+            message.textContent = "";
+        },7000)
+    });
+
+    function dateFormater(dateString){
+        if(!dateString){
+            return "";
+        }
+
+        let date = dateString.substring(0, 10)
+        let splitDate = date.split('-');
+        let year = splitDate[0];
+        let month = splitDate[1];
+        let day = splitDate[2];
+
+        let formatedDate = `${day}-${month}-${year}`;
+        return formatedDate;
+    }
+
+    document.querySelectorAll('li.edit-booking').forEach((payment) => {
+        payment.addEventListener('click', async (event) => {
+            event.preventDefault();
+            message.textContent = "";
+
+            let bookingId = event.target.parentNode.dataset.booking_id;
+
+            let table = document.querySelector('tr#booking'+bookingId);
+            let name = table.querySelector('input[name=name]');
+            
+            let nameField = edit_form.querySelector('input[name=name]');
+            let shopField = edit_form.querySelector('input[name=shop]');
+            let bookingIdField = edit_form.querySelector('input[name=booking_id]');
+            let advance_payField = edit_form.querySelector('input[name=advance_pay]');
+            let adavne_pay_date = edit_form.querySelector('input[name=advance_payment_date]');
+            let monthly_rent = edit_form.querySelector('input[name=monthly_rent]');
+            let total_paid = edit_form.querySelector('input[name=total_paid]');
+            let last_pay = edit_form.querySelector('input[name=last_pay]');
+            let start_date = edit_form.querySelector('input[name=start_date]');
+            let end_date = edit_form.querySelector('input[name=end_date]');
+            let is_ended = edit_form.querySelector('input[name=is_ended]');
+            let activity_toggle = edit_form.querySelector('.customer-toggle');
+
+            let url = "{% url 'booking-list' %}?booking="+bookingId;
+            let response = await fetch(url);
+            if(response.ok){
+                let json = await response.json();
+                json = json[0];
+
+                nameField.value = name.value;
+                shopField.value = json.shop;
+                bookingIdField.value = json.id;
+                advance_payField.value = json.advance_payment;
+                adavne_pay_date.value = dateFormater(json.advance_payment_date);
+                monthly_rent.value = json.monthly_rent;
+                total_paid.value = json.total_paid;
+                last_pay.value = dateFormater(json.last_payment_date);
+                start_date.value = dateFormater(json.rent_start_date);
+                
+                if(!json.is_ended){
+                    is_ended.checked = true;
+                    activity_toggle.textContent = "Active";
+                    activity_toggle.style.color = "#046b06";
+                    end_date.disabled = true;
+                }else{
+                    end_date.value = dateFormater(json.end_date);
+                    is_ended.checked = false;
+                    activity_toggle.textContent = "Inactive";
+                    activity_toggle.style.color = "red";
+                    end_date.disabled = false;
+
+                }
+
+            }
+            
             //event.target.click();
         })
     });
