@@ -21,18 +21,8 @@ class Booking(models.Model):
     advance_payment = models.FloatField(default=0)
     advance_payment_date = models.DateTimeField(null=True, blank=True)
     total_paid = models.FloatField(default=0)
-    total_due = models.FloatField(default=0)
     last_payment_date = models.DateTimeField(null=True, blank=True)
-
-    payment_status = models.CharField(
-        max_length=20,
-        choices=[
-            ('DUE', 'Due'),
-            ('PAID', 'Paid'),
-            ('CANCELLED', 'Cancelled')
-        ],
-        default='PAID'
-    )
+    rent_start_date = models.DateTimeField(null=True, blank=True)
 
     date_created = models.DateTimeField(auto_now_add=True)
 
@@ -59,6 +49,8 @@ class MonthlyPayment(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     month = models.CharField(max_length=100, choices=choices)
     amount = models.FloatField()
+    note = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.booking.shop}: {self.month}"
+

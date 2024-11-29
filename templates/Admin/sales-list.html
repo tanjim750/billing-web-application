@@ -1,4 +1,5 @@
-{% extends 'admin/base.html' %}
+{% extends 'Admin/base.html' %}
+{% load filters %}
 
 {% block body %}
 
@@ -114,32 +115,48 @@
                 <table class="table  datanew">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Customer Name</th>
                             <th>Shop</th>
+                            <th>Start Date</th>
                             <th>Advance</th>
                             <th>Monthly</th>
                             <th>Last Payment</th>
                             <th>Paid</th>
                             <th>Due</th>
+                            <th>Advanced Rent</th>
                             <th>Payment Status</th>
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody class="sales-list">
                         {% for booking in bookings %}
-                        <tr>
+                        <tr id="booking{{booking.id}}">
+                            <input type="hidden" name="booking-id" value="{{booking.id}}">
+                            <input type="hidden" name="name" value="{{booking.customer.name}}">
+                            <input type="hidden" name="shop" value="{{booking.shop}}">
+                            <input type="hidden" name="email" value="{{booking.customer.email}}">
+                            <input type="hidden" name="number" value="{{booking.customer.number}}">
+                            <input type="hidden" name="address" value="{{booking.customer.address}}">
+                            <input type="hidden" name="status" value="{{booking|total_due:True}}">
+
+                            <td>#{{booking.customer.id}}</td>
                             <td>{{booking.customer.name}}</td>
                             <td>{{booking.shop}}</td>
+                            <td>{{booking.rent_start_date|date:"d M Y"}}</td>
                             <td>{{booking.advance_payment}}</td>
                             <td>{{booking.monthly_rent}}</td>
-                            <td>{{booking.last_payment_date}}</td>
+                            <td>{{booking.last_payment_date|date:"d M Y"}}</td>
                             <td>{{booking.total_paid}}</td>
-                            <td>{{booking.total_due}}</td>
+                            <td>{{booking|total_due}}</td>
+                            <td>{{booking|advance_rent}}</td>
                             <td>
-                                {% if booking.payment_status == "PAID"%}
-                                <span class="badge badge-bgsuccess">{{booking.payment_status}}</span>
+                                {% if booking|total_due:True == "PAID"%}
+                                <span class="badge badge-bgsuccess">{{booking|total_due:True}}</span>
+                                {% elif booking|total_due:True == "ADVANCED" %}
+                                <span class="badge badge-bgsuccess" style="background-color: yellowgreen;"><b>{{booking|total_due:True}}</b></span>
                                 {% else %}
-                                <span class="badge badge-bgdanger">{{booking.payment_status}}</span>
+                                <span class="badge badge-bgdanger">{{booking|total_due:True}}</span>
                                 {% endif %}
                             </td>
                             <td class="text-center">
@@ -147,23 +164,17 @@
                                     <?xml version="1.0" encoding="utf-8"?><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="18px" height="18px" viewBox="0 0 29.957 122.88" enable-background="new 0 0 29.957 122.88" xml:space="preserve"><g><path fill-rule="evenodd" clip-rule="evenodd" d="M14.978,0c8.27,0,14.979,6.708,14.979,14.979c0,8.27-6.709,14.976-14.979,14.976 C6.708,29.954,0,23.249,0,14.979C0,6.708,6.708,0,14.978,0L14.978,0z M14.978,92.926c8.27,0,14.979,6.708,14.979,14.979 s-6.709,14.976-14.979,14.976C6.708,122.88,0,116.175,0,107.904S6.708,92.926,14.978,92.926L14.978,92.926z M14.978,46.463 c8.27,0,14.979,6.708,14.979,14.979s-6.709,14.978-14.979,14.978C6.708,76.419,0,69.712,0,61.441S6.708,46.463,14.978,46.463 L14.978,46.463z"/></g></svg>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sales-details-new"><i data-feather="eye" class="info-img"></i>Sale Detail</a>
+                                    <li class="booking-details" data-booking_id="{{booking.id}}">
+                                        <a href="javascript:void(0);" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sales-details-new"><i data-feather="eye" class="info-img"></i>Booking Detail</a>
                                     </li>
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#edit-sales-new"><i data-feather="edit" class="info-img"></i>Edit Sale</a>
+                                    <li class="edit-booking" data-booking_id="{{booking.id}}">
+                                        <a href="javascript:void(0);" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#edit-sales-new"><i data-feather="edit" class="info-img"></i>Edit Booking</a>
                                     </li>
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#showpayment"><i data-feather="dollar-sign" class="info-img"></i>Show Payments</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#createpayment"><i data-feather="plus-circle" class="info-img"></i>Create Payment</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item"><i data-feather="download" class="info-img"></i>Download pdf</a>
+                                    <li class="make-payment" data-booking_id="{{booking.id}}">
+                                        <a  href="javascript:void(0);" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#createpayment"><i data-feather="plus-circle" class="info-img"></i>Create Payment</a>
                                     </li>	
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item confirm-text mb-0"><i data-feather="trash-2" class="info-img"></i>Delete Sale</a>
+                                    <li class="delete-booking" data-booking_id="{{booking.id}}">
+                                        <a href="javascript:void(0);" class="dropdown-item confirm-text mb-0"><i data-feather="trash-2" class="info-img"></i>Delete Booking</a>
                                     </li>								
                                 </ul>
                             </td>
@@ -177,4 +188,112 @@
     <!-- /product list -->
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script>
+    // booking payments
+    pay_form = document.querySelector('form[id=booking-payment]')
+
+    document.querySelectorAll('li.make-payment').forEach((payment) => {
+        payment.addEventListener('click', (event) => {
+            event.preventDefault();
+            let bookingId = event.target.parentNode.dataset.booking_id;
+
+            console.log(bookingId);
+            let table = document.querySelector('tr#booking'+bookingId);
+            let name = table.querySelector('input[name=name]');
+            let shop = table.querySelector('input[name=shop]');
+            
+            let nameField = pay_form.querySelector('input[name=name]');
+            let shopField = pay_form.querySelector('input[name=shop]');
+            let bookingIdField = pay_form.querySelector('input[name=booking_id]');
+            
+            nameField.value = name.value;
+            shopField.value = shop.value;
+            bookingIdField.value = bookingId;
+            
+            event.target.click();
+        })
+    });
+
+    // booking details booking-details
+    details = document.querySelector('div#sales-details-new');
+    details_table = details.querySelector('tbody#payment-details');
+
+    document.querySelectorAll('li.booking-details').forEach((payment) => {
+        payment.addEventListener('click', async (event) => {
+            event.preventDefault();
+            details_table.replaceChildren();
+
+            let bookingId = event.target.parentNode.dataset.booking_id;
+
+            let table = document.querySelector('tr#booking'+bookingId);
+            let name = table.querySelector('input[name=name]');
+            let shop = table.querySelector('input[name=shop]');
+            let email = table.querySelector('input[name=email]');
+            let number = table.querySelector('input[name=number]');
+            let address = table.querySelector('input[name=address]');
+            let status = table.querySelector('input[name=status]');
+            
+            let nameField = details.querySelector('#name');
+            let shopField = details.querySelector('#shop');
+            let emailField = details.querySelector('#email');
+            let numberField = details.querySelector('#number');
+            let addressField = details.querySelector('#address');
+            let statusField = details.querySelector('#status');
+            let shop2Field = details.querySelector('#shop2');
+            
+            nameField.textContent = name.value;
+            shopField.textContent = shop.value;
+            numberField.textContent = number.value;
+            addressField.textContent = address.value;
+            statusField.textContent = status.value;
+            shop2Field.textContent = shop.value;
+
+            if(email.value != "None"){
+                emailField.textContent = email.value;
+                emailField.style.display = "block";
+            }else{
+                emailField.textContent = "";
+                emailField.style.display = "none";
+            }
+
+            let url = `{% url 'payment-details' 0 %}`.replace('0', bookingId);
+
+            const response = await fetch(url,{
+                method: 'GET',
+            });
+
+            if(response.ok){
+                let json = await response.json();
+                details_table.replaceChildren();
+
+                json.details.forEach((obj) => {
+                    let data = `
+                        <tr>
+                            <td>${obj.id}</td>
+                            <td>
+                                <div class="productimgname">
+                                    <a href="javascript:void(0);">${obj.month}</a>
+                                </div>												
+                            </td>
+                            <td>
+                                ${obj.amount}
+                            </td>
+                            <td>${obj.date.split("T")[0]}</td>
+                            <td>${obj.note}</td>
+                        </tr>
+                    `;
+
+                    details_table.innerHTML += data;
+                });
+                
+                //details_table.replaceChildren();
+            }
+            //event.target.click();
+        })
+    });
+
+</script>
 {% endblock %}
