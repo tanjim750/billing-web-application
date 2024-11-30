@@ -1,18 +1,35 @@
 from typing import Any
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from . import models
 from django.http import JsonResponse
 from django.core.serializers import serialize
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import logout
+from django.urls import reverse
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 import json
 from icecream import ic
+import csv, io
+import traceback
 
-class SalesListView(View):
+class Logout(LoginRequiredMixin,View):
+    def __init__(self, **kwargs):
+        self.login_url = reverse('admin:login')  # Custom login URL
+        self.redirect_field_name = 'next'
+
+    def get(self, request):
+        logout(request)
+        return redirect(reverse('admin:login'))
+    
+class SalesListView(LoginRequiredMixin,View):
     def __init__(self, *args, **kwargs):
+        self.login_url = reverse('admin:login')  # Custom login URL
+        self.redirect_field_name = 'next'
+
         self.bookings = models.Booking.objects.all()
         self.customers = models.Customer.objects.all()
         self.context = {
@@ -33,7 +50,14 @@ class SalesListView(View):
         return render(request, 'Admin/sales-list.html', context=self.context,status=200)
     
 
-class Booking(View):
+class Booking(LoginRequiredMixin, View):
+    def __init__(self, **kwargs):
+        self.login_url = reverse('admin:login')  # Custom login URL
+        self.redirect_field_name = 'next'
+
+        self.login_url = reverse('admin:login')  # Custom login URL
+        self.redirect_field_name = 'next'
+
     def post(self, request, *args, **kwargs):
         customer_id = request.POST.get('customer_id', None)
         shop = request.POST.get('shop', None)
@@ -158,10 +182,142 @@ class Booking(View):
             ic(context)
             return JsonResponse(context,status=501)
         
-        
+class ImportBooking(LoginRequiredMixin, View):
+    def __init__(self, **kwargs):
+        self.login_url = reverse('admin:login')  # Custom login URL
+        self.redirect_field_name = 'next'
 
-class MakePayment(View):
+    def post(self, request):
+        file = request.FILES.get("file",None)
+
+        ic(request.POST, request.FILES)
+        if file is None:
+            context = {
+                    "status":400,
+                    "message": "Missing required fields"
+                }
+            return JsonResponse(context,status=400)
+        
+        file_name = file.name
+        file_ext = file_name.split(".")[-1]
+        
+        if file_ext != "csv":
+            context = {
+                    "status":400,
+                    "message": "Invalid file type. Please upload a CSV file."
+                }
+            return JsonResponse(context,status=400)
+        
+        try:
+            decoded_file = io.TextIOWrapper(file.file, encoding='utf-8')
+            csv_dict = csv.DictReader(decoded_file, delimiter=',', quotechar='"')
+            
+
+            # Validate headers
+            expected_headers = ['Shop','Name','Customer','Advance','Monthly_Rent','January','February','March','April','May',
+                    'June','July','August','September','October','November','December','Start','End','Advance_Date'
+                    ]
+            all_months = ['January','February','March','April','May','June','July','August','September','October','November','December']
+            
+            if not set(expected_headers).issubset(csv_dict.fieldnames):
+                 # Check for missing and unexpected headers
+                missing_headers = [header for header in expected_headers if header not in csv_dict.fieldnames]
+
+                context ={
+                    "status": 400,
+                    "message": "CSV headers are invalid. Missing headers: " + ", ".join(missing_headers)
+                }
+                return JsonResponse(context, status=400)
+            
+            # extrar data
+            for row in csv_dict:
+                shop = row.get('Shop', "--")
+                name = row.get('Name', None)
+                customer_no = row.get('Customer', None)
+                advance = row.get('Advance', 0)
+                monthly_rent = row.get('Monthly_Rent', 0)
+                paid_months = {month:row.get(month,None) for month in all_months if row.get(month,None)}
+                rent_start_date = row.get('Start', "01-01-1001")
+                end = row.get('End', None)
+                advance_date = row.get('Advance_Date', None)
+
+                # ic(shop,name,customer_no,advance,monthly_rent,paid_months,rent_start_date,end,advance_date)
+
+                if name and monthly_rent :
+
+                    customer = None
+                    if customer_no != '' and customer_no == '2':
+                        ic(customer_no)
+                        customer = models.Customer.objects.filter(name=name).first()
+                        ic(customer,"customer 1")
+                    
+                    if customer is None:
+                        customer = models.Customer.objects.create(
+                            name=name,
+                            number= "no number",
+                            address = "no address",
+                        )
+                    # ic(customer,"Customer 2")
+                    
+                    # ic(customer)
+                    shops = shop.split(",")
+                    # ic(name,shop,advance,advance_date,monthly_rent,rent_start_date,paid_months)
+                    for s in shops:
+                        # formate date
+                        start_date = datetime.strptime(rent_start_date,"%d-%m-%Y")
+                        start_date = start_date.strftime("%Y-%m-%d")
+                        advance_payment_date = datetime.strptime(advance_date,"%d-%m-%Y") if advance_date else None
+                        advance_payment_date = advance_payment_date.strftime("%Y-%m-%d") if advance_payment_date else None
+                        rent_end_date = datetime.strptime(end, "%d-%m-%Y") if end else None
+                        rent_end_date = rent_end_date.strftime("%Y-%m-%d") if rent_end_date else None
+                        
+                        total_paid = len(paid_months)*float(monthly_rent)
+                        booking = models.Booking.objects.create(
+                            customer = customer,
+                            shop = s,
+                            monthly_rent = monthly_rent if monthly_rent else 0,
+                            advance_payment = advance if advance else 0,
+                            advance_payment_date = advance_payment_date,
+                            total_paid = total_paid,
+                            rent_start_date = start_date,
+                            end_date = rent_end_date,
+                            is_ended = False if rent_end_date is None else True,
+                        )
+
+                        for month,date in paid_months.items():
+                            rent_date = datetime.strptime(date, "%d-%m-%Y") if date else None
+                            rent_date = rent_date.strftime("%Y-%m-%d") if rent_date else None
+
+                            if(rent_date):
+                                models.MonthlyPayment.objects.create(
+                                    booking = booking,
+                                    date = rent_date,
+                                    month = month,
+                                    amount = monthly_rent,
+                                )
+
+            context = {
+                    "status": 200,
+                    "message": "Customers Successfully Updated"
+                }
+
+            return JsonResponse(context,status=200)
+
+        except Exception as e:
+            traceback.print_exc()
+            ic(e)
+            context = {
+                    "status":501,
+                    "message": "Internal Server Error",
+                    "error": str(e)
+                }
+            return JsonResponse(context,status=501)
+
+class MakePayment(LoginRequiredMixin, View):
     def __init__(self) -> None:
+        self.login_url = reverse('admin:login')  # Custom login URL
+        self.redirect_field_name = 'next'
+
         self.context = {}
 
     def count_months(self, **months):
@@ -249,14 +405,21 @@ class MakePayment(View):
             self.context['error'] = str(e)
             return JsonResponse(self.context, status=501)
             
-class PaymentDetails(View):
+class PaymentDetails(LoginRequiredMixin, View):
+    def __init__(self, **kwargs):
+        self.login_url = reverse('admin:login')  # Custom login URL
+        self.redirect_field_name = 'next'
+
     def get(self, request, id):
         details = models.MonthlyPayment.objects.filter(booking_id = id).values()
         # json_details = serialize("json",details)
         return JsonResponse({'details': list(details)})
 
-class Customer(View):
+class Customer(LoginRequiredMixin, View):
     def __init__(self) -> None:
+        self.login_url = reverse('admin:login')  # Custom login URL
+        self.redirect_field_name = 'next'
+
         self.customers = models.Customer.objects.all().order_by('date_created')
         self.context = {
         }
@@ -272,6 +435,7 @@ class Customer(View):
         nid = request.POST.get('nid', None)
         address = request.POST.get('address', None)
 
+        ic(name,email,number,address,nid)
         try:
             if name and number and address:
                 customer = models.Customer.objects.create(
@@ -299,27 +463,34 @@ class Customer(View):
             return JsonResponse(self.context, status=501)
         
     def put(self, request, *args, **kwargs):
-        id = request.GET.get('id', None)
-        name = request.POST.get('name', None)
-        email = request.POST.get('email', None)
-        number = request.POST.get('number', None)
-        nid = request.POST.get('nid', None)
-        address = request.POST.get('address', None)
+        body = json.loads(request.body.decode('utf-8'))
+
+        id = body.get('id', None)
+        name = body.get('name', None)
+        email = body.get('email', None)
+        number = body.get('number', None)
+        nid = body.get('nid', None)
+        address = body.get('address', None)
 
         try:
             if id and name and number and address:
-                customer = models.Customer.objects.create(
-                    name=name, 
-                    email=email, 
-                    nid=nid, 
-                    address=address, 
-                    number = number
-                    )
-                customer.save()
+                customer = models.Customer.objects.filter(id=id.replace("#","")).first()
 
+                if not customer:
+                    self.context['status'] = 400
+                    self.context['message'] = 'Customer not found'
+                    return JsonResponse(self.context, status=400)
+
+                customer.name = name
+                customer.email = email
+                customer.number = number
+                customer.nid = nid
+                customer.address = address
+
+                customer.save()
                 # self.context['customers'] = models.Customer.objects.all()
                 self.context['status'] = 200
-                self.context['message'] = 'Successfully created new customer.'
+                self.context['message'] = 'Customer successfully updated'
                 return JsonResponse(self.context, status=200)
             else:
                 self.context['status'] = 400

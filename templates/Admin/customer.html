@@ -12,22 +12,7 @@
        </div>
        <ul class="table-top-head">
           <li>
-             <a data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Pdf" data-bs-original-title="Pdf"><img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/icons/pdf.svg" alt="img"></a>
-          </li>
-          <li>
-             <a data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Excel" data-bs-original-title="Excel"><img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/icons/excel.svg" alt="img"></a>
-          </li>
-          <li>
-             <a data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Print" data-bs-original-title="Print">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer feather-rotate-ccw">
-                   <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                   <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                   <rect x="6" y="14" width="12" height="8"></rect>
-                </svg>
-             </a>
-          </li>
-          <li>
-             <a data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh">
+             <a href="{% url 'customer-list' %}" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rotate-ccw">
                    <polyline points="1 4 1 10 7 10"></polyline>
                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
@@ -288,10 +273,13 @@
                                 </div>
                                 				
                             </div>								
-                            
-                            <div class="modal-footer-btn">
-                                <button type="button" class="btn btn-cancel me-2" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-submit">Submit</button>
+                            <div class="row">
+                                <div class="col-8">
+                                    <b id="message"></b>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <button type="submit" class="btn btn-submit add-sale">Submit</button>
+                                </div>
                             </div>
                         </form>
                     
@@ -353,9 +341,13 @@
                                 				
                             </div>								
                             
-                            <div class="modal-footer-btn">
-                                <button type="button" class="btn btn-cancel me-2" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-submit">Submit</button>
+                            <div class="row">
+                                <div class="col-8">
+                                    <b id="message"></b>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <button type="submit" class="btn btn-submit add-sale">Submit</button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -370,6 +362,9 @@
 <script>
     let edit_form = document.querySelector('form#form-edit');
     let add_form = document.querySelector('form#form-add');
+
+    let edit_msg = edit_form.querySelector('#message');
+    let add_msg = add_form.querySelector('#message');
 
 
     document.querySelectorAll("a.customer_edit_btn").forEach( click_event => {
@@ -412,6 +407,72 @@
             event.target.parentNode.click();
         });
     })
+
+    edit_form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        let formData = new FormData(edit_form);
+        let jsonData = Object.fromEntries(formData.entries());
+        let csrfToken = edit_form.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+        let url = "{% url 'customer-list' %}"
+        try{
+            let response = await fetch(url,{
+                method: 'PUT',
+                headers:{
+                    'Content-Type': 'application/json',
+                    "X-CSRFToken":csrfToken
+                },
+                body: JSON.stringify(jsonData)
+            })
+
+            let json = await response.json();
+            let responseMessage = json.message;
+            edit_msg.textContent = responseMessage;
+
+            if(response.ok){
+                edit_msg.style.color = "green";
+            }else{
+                edit_msg.style.color = "red";
+            }
+
+        }catch{
+            edit_msg.textContent = "Something went wrong. Please try again";
+            edit_msg.style.color = "red";
+        }
+    });
+
+    add_form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        let formData = new FormData(add_form);
+        let csrfToken = add_form.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+        let url = "{% url 'customer-list' %}"
+        try{
+            let response = await fetch(url,{
+                method: 'POST',
+                headers:{
+                    "X-CSRFToken":csrfToken
+                },
+                body: formData
+            })
+
+            let json = await response.json();
+            let responseMessage = json.message;
+            add_msg.textContent = responseMessage;
+
+            if(response.ok){
+                add_msg.style.color = "green";
+            }else{
+                add_msg.style.color = "red";
+            }
+
+        }catch{
+            add_msg.textContent = "Something went wrong. Please try again";
+            add_msg.style.color = "red";
+        }
+    });
 
 </script>
 

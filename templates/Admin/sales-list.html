@@ -1,5 +1,6 @@
 {% extends 'Admin/base.html' %}
 {% load filters %}
+{% load static %}
 
 {% block body %}
 
@@ -13,15 +14,6 @@
         </div>
         <ul class="table-top-head">
             <li>
-                <a data-bs-toggle="tooltip" data-bs-placement="top" title="Pdf"><img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/icons/pdf.svg" alt="img"></a>
-            </li>
-            <li>
-                <a data-bs-toggle="tooltip" data-bs-placement="top" title="Excel"><img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/icons/excel.svg" alt="img"></a>
-            </li>
-            <li>
-                <a data-bs-toggle="tooltip" data-bs-placement="top" title="Print"><i data-feather="printer" class="feather-rotate-ccw"></i></a>
-            </li>
-            <li>
                 <a href="{% url 'booking-list' %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh"><i data-feather="rotate-ccw" class="feather-rotate-ccw"></i></a>
             </li>
             <li>
@@ -29,7 +21,12 @@
             </li>
         </ul>
         <div class="page-btn">
-            <a href="sales-list.html#" class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-sales-new"><i data-feather="plus-circle" class="me-2"></i> Add New Booking</a>
+            <a href="#" class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-sales-new"><i data-feather="plus-circle" class="me-2"></i> Add New Booking</a>
+        </div>
+        <div class="page-btn import">
+            <a href="#" class="btn btn-added color" data-bs-toggle="modal" data-bs-target="#view-notes"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download me-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Import Customer
+            </a>
         </div>
     </div>
     
@@ -198,6 +195,55 @@
 
 {% endblock %}
 
+{% block model %}
+<div class="modal fade" id="view-notes">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="page-wrapper-new p-0">
+                <div class="content">
+                    <div class="modal-header border-0 custom-modal-header">
+                        <div class="page-title">
+                            <h4>Import Customer</h4>
+                        </div>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body custom-modal-body">
+                        <form id="import-booking" action="{% url 'import-booking' %}" method="post" enctype="multipart/form-data"> {% csrf_token %}
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="input-blocks image-upload-down">
+                                        <label>	Upload CSV File <span id="file-name"> (No file Selected)</span></label>
+                                        <div class="image-upload download">
+                                            <input type="file" name="file">
+                                            <div class="image-uploads">
+                                                <img src="{% static 'assets/img/download-img.png' %}" alt="img">
+                                                <h4>Drag and drop a <span>file to upload</span></h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>	
+                            <div class="row">
+                                <div class="col-8">
+                                    <b id="message"></b>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <button type="submit" class="btn btn-submit add-sale">Submit</button>
+                                </div>
+                            </div>
+                            
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block script %}
 <script>
     // booking payments
@@ -364,7 +410,7 @@
 
         setTimeout(function(){
             message.textContent = "";
-        },7000)
+        },5000)
     });
 
     function dateFormater(dateString){
@@ -439,6 +485,65 @@
             
             //event.target.click();
         })
+    });
+
+    // import booking from csv file
+    import_form = document.querySelector("form[id=import-booking]");
+    upload_msg = import_form.querySelector("#message")
+    let filename = import_form.querySelector("#file-name");
+    let fileField = import_form.querySelector("input[name=file]");
+
+    fileField.addEventListener("change", event => {
+        let file = event.target.value;
+        filename.textContent = `(${file})`;
+    });
+
+    import_form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        let csrfToken = edit_form.querySelector('[name=csrfmiddlewaretoken]').value;
+        let formData = new FormData(import_form);
+        jsonData = Object.fromEntries(formData.entries()); 
+
+
+        upload_msg.textContent = "Uploading, Please wait...";
+        upload_msg.style.color = "green";
+        
+        try{
+            let url = "{% url 'import-booking' %}";
+            let response = await fetch(url,{
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            });
+            
+            
+            let json = await response.json();
+            let responseMessage = json.message;
+            upload_msg.textContent = responseMessage;
+            
+            if(response.ok){
+                upload_msg.style.color = "green";
+            }else{
+                upload_msg.style.color = "red";
+            }
+
+            setTimeout(function(){
+                upload_msg.textContent = "";
+            },7000)
+            
+        }catch{
+            upload_msg.textContent = "Something went wrong. Please try again";
+            upload_msg.style.color = "red";
+
+            setTimeout(function(){
+                upload_msg.textContent = "";
+            },7000)
+        }
+
+        
     });
 
 </script>
