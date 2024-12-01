@@ -166,7 +166,7 @@
                    </thead>
                    <tbody>
                     {% for customer in customers %}
-                      <tr class="odd" id="table{{customer.id}}">
+                      <tr class="odd" id="table{{customer.id}}" data-id="{{customer.id}}">
                          <td class="customer_id">
                             #{{customer.id}}
                          </td>
@@ -188,8 +188,8 @@
                          </td>
                          <td class="customer_address">{{customer.address}}</td>
                          <td>{{customer.date_created|date:"d M Y"}}</td>
-                         <td class="action-table-data">
-                            <div class="edit-delete-action">
+                         <td class="action-table-data" data-id="{{customer.id}}">
+                            <div class="edit-delete-action" data-id="{{customer.id}}">
                                
                                <a class="me-2 p-2 customer_edit_btn" href="#" data-bs-toggle="modal" data-bs-target="#edit-units" >
                                     <input type="hidden" value="{{customer.id}}">
@@ -198,7 +198,8 @@
                                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                   </svg>
                                </a>
-                               <a class="confirm-text p-2" href="javascript:void(0);">
+                               
+                               <a class="delete-customer p-2" href="javascript:void(0);" data-id="{{customer.id}}">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2">
                                      <polyline points="3 6 5 6 21 6"></polyline>
                                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -219,7 +220,8 @@
        </div>
        <!-- /product list -->
     </div>
-    
+
+    {% csrf_token %}
 
 {% endblock %}
 
@@ -289,6 +291,79 @@
         </div>
     </div>
 </div>
+
+<!-- delete customer model -->
+<div id="confirm-delete" class="swal2-container swal2-center swal2-backdrop-show" style="overflow-y: auto; display: none;">
+    <div aria-labelledby="swal2-title" aria-describedby="swal2-content" class="swal2-popup swal2-modal swal2-show" tabindex="-1" role="dialog" aria-live="assertive" aria-modal="true" style="display: flex;">
+       <div class="swal2-header">
+          <ul class="swal2-progress-steps" style="display: none;"></ul>
+          <div class="swal2-icon swal2-error" style="display: none;"></div>
+          <div class="swal2-icon swal2-question" style="display: none;"></div>
+          <div class="swal2-icon swal2-warning" style="display: none;"></div>
+          <div class="swal2-icon swal2-info" style="display: none;"></div>
+          <div class="swal2-icon swal2-success" style="display: none;"></div>
+          <img class="swal2-image" style="display: none;">
+          <h2 class="swal2-title" id="swal2-title" style="display: flex;">Are you sure?</h2>
+          <button type="button" class="swal2-close" aria-label="Close this dialog" style="display: none;">×</button>
+       </div>
+       <div class="swal2-content">
+          <div id="swal2-content" class="swal2-html-container" style="display: block;">You won't be able to revert this!</div>
+          <input class="swal2-input" style="display: none;"><input type="file" class="swal2-file" style="display: none;">
+          <div class="swal2-range" style="display: none;"><input type="range"><output></output></div>
+          <select class="swal2-select" style="display: none;"></select>
+          <div class="swal2-radio" style="display: none;"></div>
+          <label for="swal2-checkbox" class="swal2-checkbox" style="display: none;"><input type="checkbox"><span class="swal2-label"></span></label>
+          <textarea class="swal2-textarea" style="display: none;"></textarea>
+          <div class="swal2-validation-message" id="swal2-validation-message"></div>
+       </div>
+       <div class="swal2-actions">
+          <div class="swal2-loader"></div>
+          <button id="confirmed-delete" type="button" class="swal2-confirm btn btn-primary" style="display: inline-block;" >Yes, delete it!</button>
+          <button type="button" class="swal2-deny" aria-label="" style="display: none;">No</button>
+          <button type="button" class="swal2-cancel btn btn-danger ml-1" style="display: inline-block;" onclick='document.querySelector("#confirm-delete").style.display = "none";'>Cancel</button>
+       </div>
+       <div class="swal2-footer" style="display: none;"></div>
+       <div class="swal2-timer-progress-bar-container">
+          <div class="swal2-timer-progress-bar" style="display: none;"></div>
+       </div>
+    </div>
+ </div>
+
+ <!-- delete confirmed model -->
+ <div id="confirm-deleted" class="swal2-container swal2-center swal2-backdrop-show" style="overflow-y: auto; display: none;">
+    <div aria-labelledby="swal2-title" aria-describedby="swal2-content" class="swal2-popup swal2-modal swal2-show" tabindex="-1" role="dialog" aria-live="assertive" aria-modal="true" style="display: flex;">
+       <div class="swal2-header">
+          <ul class="swal2-progress-steps" style="display: none;"></ul>
+          <div class="swal2-icon swal2-error" style="display: none;"></div>
+          <div class="swal2-icon swal2-question" style="display: none;"></div>
+          <div class="swal2-icon swal2-warning" style="display: none;"></div>
+          <div class="swal2-icon swal2-info" style="display: none;"></div>
+          <div class="swal2-icon swal2-success" style="display: none;"></div>
+          <img class="swal2-image" style="display: none;">
+          <h2 class="swal2-title" id="swal2-title" style="display: flex;">Deleted!</h2>
+          <button type="button" class="swal2-close" aria-label="Close this dialog" style="display: none;">×</button>
+       </div>
+       <div class="swal2-content">
+          <div id="delete-response-msg" class="swal2-html-container" style="display: block;">Customer has been deleted.</div>
+          <input class="swal2-input" style="display: none;"><input type="file" class="swal2-file" style="display: none;">
+          <div class="swal2-range" style="display: none;"><input type="range"><output></output></div>
+          <select class="swal2-select" style="display: none;"></select>
+          <div class="swal2-radio" style="display: none;"></div>
+          <label for="swal2-checkbox" class="swal2-checkbox" style="display: none;"><input type="checkbox"><span class="swal2-label"></span></label>
+          <textarea class="swal2-textarea" style="display: none;"></textarea>
+          <div class="swal2-validation-message" id="swal2-validation-message"></div>
+       </div>
+       <div class="swal2-actions">
+          <div class="swal2-loader"></div>
+          <button id="delete-done" type="button" class="swal2-confirm btn btn-success swal2-styled" aria-label="" style="display: inline-block;">OK</button><button type="button" class="swal2-deny swal2-styled" aria-label="" style="display: none;">No</button>
+          <button type="button" class="swal2-cancel swal2-styled" style="display: none;" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+       </div>
+       <div class="swal2-footer" style="display: none;"></div>
+       <div class="swal2-timer-progress-bar-container">
+          <div class="swal2-timer-progress-bar" style="display: none;"></div>
+       </div>
+    </div>
+ </div>
 
 <!-- edit customer model  -->
 <div class="modal fade" id="edit-units" style="display: none;" aria-hidden="true">
@@ -474,6 +549,69 @@
         }
     });
 
+
+    // delete customer
+    console.log(document.querySelectorAll(".delete-customer"));
+    document.querySelectorAll(".delete-customer").forEach(customer => {
+        customer.addEventListener("click", (event) =>{
+            let id = event.target.parentNode.parentNode.dataset.id;
+            console.log(event.target.parentNode.parentNode)
+            let data = {
+                id: id,
+            };
+            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            let url = "{% url 'customer-list' %}"
+            let message = document.querySelector("#delete-response-msg");
+            console.log(data);
+
+            let deleteCustomer = async () =>{
+                try{
+
+                    let response = await fetch(url,{
+                        method: 'delete',
+                        headers: {
+                            "Content-Type":"application/json",
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: JSON.stringify(data)
+                    });
+    
+                    let json = await response.json();
+                    message.textContent = json.message;
+    
+                    if(response.ok){
+                        message.style.color = "green";
+                        try{
+
+                            document.querySelector("#table"+id).remove();
+                        }catch(e){
+                            console.log(e);
+                        }
+                    }else{
+                        message.style.color = "red";
+                    }
+                }catch{
+                    message.textContent = "Something went wrong."
+                    message.style.color = "red";
+                }
+            };
+
+            document.querySelector("#confirm-delete").style.display = "block";
+
+            document.querySelector("#confirmed-delete").addEventListener("click", () => {
+                deleteCustomer();
+                document.querySelector("#confirm-deleted").style.display = "block";
+                document.querySelector("#confirm-delete").style.display = "none";
+                deleteCustomer = () => {}; // clearing the function
+
+            })
+
+            document.querySelector("#delete-done").addEventListener("click", ()=>{
+                deleteCustomer = () => {}; // clearing the function
+                document.querySelector("#confirm-deleted").style.display = "none";
+            })
+        })
+    });
 </script>
 
 {% endblock %} 

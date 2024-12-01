@@ -502,3 +502,42 @@ class Customer(LoginRequiredMixin, View):
             self.context['message'] = 'Internal Server Error'
             self.context['error'] = str(e)
             return JsonResponse(self.context, status=501)
+
+    def delete(self,request):
+        body = json.loads(request.body.decode('utf-8'))
+
+        id = body.get('id',None)
+
+        if id is None:
+            context = {
+                "status": 400,
+                "message": "Missing required fields"
+            }
+            return JsonResponse(context,status=400)
+        
+        customer = models.Customer.objects.filter(id=id).first()
+
+        if not customer:
+            context = {
+                "status": 400,
+                "message": "Unknown customer information"
+            }
+            return JsonResponse(context,status=400)
+        
+        try:
+            customer.delete()
+            context = {
+                "status": 200,
+                "message": "Customer deleted successfully"
+            }
+            return JsonResponse(context,status=200)
+        
+        except Exception as e:
+            traceback.print_exc()
+            context = {
+                "status": 501,
+                "message": "Internal Server Error",
+                "error": str(e)
+            }
+            return JsonResponse(context,status=200)
+        
