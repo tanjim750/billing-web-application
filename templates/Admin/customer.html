@@ -166,7 +166,7 @@
                    </thead>
                    <tbody>
                     {% for customer in customers %}
-                      <tr class="odd" id="table{{customer.id}}" data-id="{{customer.id}}">
+                      <tr class="odd" id="table{{customer.id}}" data-booking_id="{{customer.id}}">
                          <td class="customer_id">
                             #{{customer.id}}
                          </td>
@@ -188,8 +188,8 @@
                          </td>
                          <td class="customer_address">{{customer.address}}</td>
                          <td>{{customer.date_created|date:"d M Y"}}</td>
-                         <td class="action-table-data" data-id="{{customer.id}}">
-                            <div class="edit-delete-action" data-id="{{customer.id}}">
+                         <td class="action-table-data" data-booking_id="{{customer.id}}">
+                            <div class="edit-delete-action" data-booking_id="{{customer.id}}">
                                
                                <a class="me-2 p-2 customer_edit_btn" href="#" data-bs-toggle="modal" data-bs-target="#edit-units" >
                                     <input type="hidden" value="{{customer.id}}">
@@ -199,7 +199,7 @@
                                   </svg>
                                </a>
                                
-                               <a class="delete-customer p-2" href="javascript:void(0);" data-id="{{customer.id}}">
+                               <a class="delete-customer p-2" href="javascript:void(0);" data-booking_id="{{customer.id}}">
                                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2">
                                      <polyline points="3 6 5 6 21 6"></polyline>
                                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -551,10 +551,9 @@
 
 
     // delete customer
-    console.log(document.querySelectorAll(".delete-customer"));
     document.querySelectorAll(".delete-customer").forEach(customer => {
         customer.addEventListener("click", (event) =>{
-            let id = event.target.parentNode.parentNode.dataset.id;
+            let id = event.target.parentNode.parentNode.dataset.booking_id;
             console.log(event.target.parentNode.parentNode)
             let data = {
                 id: id,

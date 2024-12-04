@@ -190,7 +190,7 @@ class ImportBooking(LoginRequiredMixin, View):
     def post(self, request):
         file = request.FILES.get("file",None)
 
-        ic(request.POST, request.FILES)
+        # ic(request.POST, request.FILES)
         if file is None:
             context = {
                     "status":400,
@@ -214,7 +214,7 @@ class ImportBooking(LoginRequiredMixin, View):
             
 
             # Validate headers
-            expected_headers = ['Shop','Name','Customer','Advance','Monthly_Rent','January','February','March','April','May',
+            expected_headers = ['Shop ','Name','Customer','Advance','Monthly_Rent','January','February','March','April','May',
                     'June','July','August','September','October','November','December','Start','End','Advance_Date'
                     ]
             all_months = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -231,25 +231,25 @@ class ImportBooking(LoginRequiredMixin, View):
             
             # extrar data
             for row in csv_dict:
-                shop = row.get('Shop', "--")
+                shop = row.get('Shop ', "--")
                 name = row.get('Name', None)
                 customer_no = row.get('Customer', None)
                 advance = row.get('Advance', 0)
                 monthly_rent = row.get('Monthly_Rent', 0)
                 paid_months = {month:row.get(month,None) for month in all_months if row.get(month,None)}
-                rent_start_date = row.get('Start', "01-01-1001")
+                rent_start_date = row.get('Start', None)
                 end = row.get('End', None)
                 advance_date = row.get('Advance_Date', None)
 
                 # ic(shop,name,customer_no,advance,monthly_rent,paid_months,rent_start_date,end,advance_date)
 
-                if name and monthly_rent :
+                if name and monthly_rent and rent_start_date:
 
                     customer = None
                     if customer_no != '' and customer_no == '2':
-                        ic(customer_no)
+                        # ic(customer_no)
                         customer = models.Customer.objects.filter(name=name).first()
-                        ic(customer,"customer 1")
+                        # ic(customer,"customer 1")
                     
                     if customer is None:
                         customer = models.Customer.objects.create(
@@ -264,11 +264,11 @@ class ImportBooking(LoginRequiredMixin, View):
                     # ic(name,shop,advance,advance_date,monthly_rent,rent_start_date,paid_months)
                     for s in shops:
                         # formate date
-                        start_date = datetime.strptime(rent_start_date,"%d-%m-%Y")
+                        start_date = datetime.strptime(rent_start_date.strip().replace(".","-"),"%d-%m-%Y")
                         start_date = start_date.strftime("%Y-%m-%d")
-                        advance_payment_date = datetime.strptime(advance_date,"%d-%m-%Y") if advance_date else None
+                        advance_payment_date = datetime.strptime(advance_date.strip().replace(".","-"),"%d-%m-%Y") if advance_date else None
                         advance_payment_date = advance_payment_date.strftime("%Y-%m-%d") if advance_payment_date else None
-                        rent_end_date = datetime.strptime(end, "%d-%m-%Y") if end else None
+                        rent_end_date = datetime.strptime(end.strip().replace(".","-"), "%d-%m-%Y") if end else None
                         rent_end_date = rent_end_date.strftime("%Y-%m-%d") if rent_end_date else None
                         
                         total_paid = len(paid_months)*float(monthly_rent)
@@ -285,16 +285,19 @@ class ImportBooking(LoginRequiredMixin, View):
                         )
 
                         for month,date in paid_months.items():
-                            rent_date = datetime.strptime(date, "%d-%m-%Y") if date else None
-                            rent_date = rent_date.strftime("%Y-%m-%d") if rent_date else None
+                            try:
+                                rent_date = datetime.strptime(date.strip().replace(".","-"), "%d-%m-%Y") if date else None
+                                rent_date = rent_date.strftime("%Y-%m-%d") if rent_date else None
 
-                            if(rent_date):
-                                models.MonthlyPayment.objects.create(
-                                    booking = booking,
-                                    date = rent_date,
-                                    month = month,
-                                    amount = monthly_rent,
-                                )
+                                if(rent_date):
+                                    models.MonthlyPayment.objects.create(
+                                        booking = booking,
+                                        date = rent_date,
+                                        month = month,
+                                        amount = monthly_rent,
+                                    )
+                            except Exception as e:
+                                pass
 
             context = {
                     "status": 200,
