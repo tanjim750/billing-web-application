@@ -56,3 +56,9 @@ class MonthlyPayment(models.Model):
     def __str__(self):
         return f"{self.booking.shop}: {self.month}"
 
+class Logo(models.Model):
+    normal = models.FileField(upload_to="logo")
+    white = models.FileField(upload_to="logo")
+    small = models.FileField(upload_to="logo")
+
+    

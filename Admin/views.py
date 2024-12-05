@@ -33,17 +33,39 @@ class SalesListView(LoginRequiredMixin,View):
         self.bookings = models.Booking.objects.all()
         self.customers = models.Customer.objects.all()
         self.context = {
-            "customers": self.customers
+            "customers": self.customers,
+            "logo":{
+                "logo": models.Logo.objects.first(),
+                "id": models.Logo.objects.first().id
+            }
         }
 
     def get(self, request, *args, **kwargs):
-        id = request.GET.get('booking', None)
-        if(id is not None):
-            get_booking = models.Booking.objects.filter(id=id)
-            if(get_booking):
-                return JsonResponse(list(get_booking.values()),safe=False)
+        booking = request.GET.get('booking', None)
+        if(booking is not None):
+            if booking == "all":
+                all_bookings = []
+                for b in self.bookings:
+                    dict = {}
+                    dict["id"] = str(b.id)
+                    dict["name"] = b.customer.name
+                    dict["number"] = b.customer.number
+                    dict["nid"] = b.customer.nid
+                    dict["email"] = b.customer.email
+                    dict["shop"] = b.shop
+                    dict["sYear"] = str(b.rent_start_date.year)
+                    dict["lYear"] = str(b.last_payment_date.year) if b.last_payment_date else ""
+                    dict["total_paid"] = str(b.total_paid)
+                    all_bookings.append(dict)
+
+                return JsonResponse(all_bookings,safe=False, status=200)
+            
             else:
-                return JsonResponse({"satus":400,"error":"Booking not found"}, status=400)
+                get_booking = models.Booking.objects.filter(id=booking)
+                if(get_booking):
+                    return JsonResponse(list(get_booking.values()),safe=False)
+                else:
+                    return JsonResponse({"satus":400,"error":"Booking not found"}, status=400)
         
         self.context['bookings'] = self.bookings
 
@@ -66,6 +88,7 @@ class Booking(LoginRequiredMixin, View):
         advance_payment_date = request.POST.get('advance_payment_date', None)
         rent_start_date = request.POST.get('rent_start_date', None)
 
+        ic(request.POST)
         context = {}
 
         try:
@@ -181,6 +204,43 @@ class Booking(LoginRequiredMixin, View):
                 }
             ic(context)
             return JsonResponse(context,status=501)
+    
+    def delete(self,request):
+        body = json.loads(request.body.decode('utf-8'))
+
+        id = body.get('id',None)
+
+        if id is None:
+            context = {
+                "status": 400,
+                "message": "Missing required fields"
+            }
+            return JsonResponse(context,status=400)
+        
+        customer = models.Booking.objects.filter(id=id).first()
+
+        if not customer:
+            context = {
+                "status": 400,
+                "message": "Unknown Booking information"
+            }
+            return JsonResponse(context,status=400)
+        
+        try:
+            customer.delete()
+            context = {
+                "status": 200,
+                "message": "Booking deleted successfully"
+            }
+            return JsonResponse(context,status=200)
+        
+        except Exception as e:
+            context = {
+                "status": 501,
+                "message": "Internal Server Error",
+                "error": str(e)
+            }
+            return JsonResponse(context,status=200)
         
 class ImportBooking(LoginRequiredMixin, View):
     def __init__(self, **kwargs):
@@ -271,13 +331,13 @@ class ImportBooking(LoginRequiredMixin, View):
                         rent_end_date = datetime.strptime(end.strip().replace(".","-"), "%d-%m-%Y") if end else None
                         rent_end_date = rent_end_date.strftime("%Y-%m-%d") if rent_end_date else None
                         
-                        total_paid = len(paid_months)*float(monthly_rent)
+                        total_paid = len(paid_months)*float(monthly_rent.strip())
                         booking = models.Booking.objects.create(
                             customer = customer,
                             shop = s,
                             monthly_rent = monthly_rent if monthly_rent else 0,
                             advance_payment = advance if advance else 0,
-                            advance_payment_date = advance_payment_date,
+                            advance_payment_date = advance_payment_date.strip() if advance_payment_date else None,
                             total_paid = total_paid,
                             rent_start_date = start_date,
                             end_date = rent_end_date,
@@ -407,6 +467,49 @@ class MakePayment(LoginRequiredMixin, View):
             self.context['message'] = 'Internal Server Error'
             self.context['error'] = str(e)
             return JsonResponse(self.context, status=501)
+    
+    def delete(self,request):
+        body = json.loads(request.body.decode('utf-8'))
+
+        id = body.get('id', None)
+
+        if id is None:
+            context = {
+                "status": 400,
+                "message": "Missing required fields"
+            }
+            return JsonResponse(context,status=400)
+        
+        payment = models.MonthlyPayment.objects.filter(id=id).first()
+
+        if not payment:
+            context = {
+                "status": 400,
+                "message": "Unknown payment information"
+            }
+            return JsonResponse(context,status=400)
+        
+        try:
+            booking = payment.booking
+            booking.total_paid -= payment.amount
+            booking.save()
+
+            payment.delete()
+            context = {
+                "status": 200,
+                "message": "payment deleted successfully"
+            }
+            return JsonResponse(context,status=200)
+        
+        except Exception as e:
+            traceback.print_exc()
+            context = {
+                "status": 501,
+                "message": "Internal Server Error",
+                "error": str(e)
+            }
+            return JsonResponse(context,status=200)
+        
             
 class PaymentDetails(LoginRequiredMixin, View):
     def __init__(self, **kwargs):
@@ -425,6 +528,10 @@ class Customer(LoginRequiredMixin, View):
 
         self.customers = models.Customer.objects.all().order_by('date_created')
         self.context = {
+            "logo":{
+                "logo": models.Logo.objects.first(),
+                "id": models.Logo.objects.first().id
+            }
         }
 
     def get(self, request, *args, **kwargs):
