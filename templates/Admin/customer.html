@@ -40,117 +40,100 @@
     </div>
     <!-- /product list -->
     <div class="card table-list-card">
-       <div class="card-body">
-          <div class="table-top">
-             <div class="search-set">
-                <div class="search-input">
-                   <a href="" class="btn btn-searchset">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
-                         <circle cx="11" cy="11" r="8"></circle>
-                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                      </svg>
-                   </a>
-                   <div id="DataTables_Table_0_filter" class="dataTables_filter"><label> <input type="search" class="form-control form-control-sm" placeholder="Search" aria-controls="DataTables_Table_0"></label></div>
+        <div class="card-body">
+            <div class="table-top">
+                <div class="search-set">
+                    <div class="search-input">
+                        <a href="sales-list.html" class="btn btn-searchset"><i data-feather="search" class="feather-search"></i></a>
+                    </div>
                 </div>
-             </div>
-             <div class="search-path">
-                <div class="d-flex align-items-center">
-                   <a class="btn btn-filter">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-filter filter-icon">
-                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                      </svg>
-                      <span><img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/icons/closes.svg" alt="img"></span>
-                   </a>
-                </div>
-             </div>
-          </div>
-          <div class="table-responsive">
-             <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer table-responsive">
-                <table class="table datanew dataTable no-footer"  aria-describedby="DataTables_Table_0_info">
-                   <thead>
-                      <tr>
-                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-label="Customer  Name: activate to sort column ascending" style="width: 241px;">
-                            ID
-                        </th>
-                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-label="Customer  Name: activate to sort column ascending" style="width: 241px;">
-                            Name
-                        </th>
-                         <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-label="Email: activate to sort column ascending" style="width: 251.547px;">
-                            Email
-                        </th>
-                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-label="Phone: activate to sort column ascending" style="width: 154.719px;">
-                            Phone
-                        </th>
-                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-label="Phone: activate to sort column ascending" style="width: 154.719px;">
-                            NID
-                        </th>
-                         <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-label="Country: activate to sort column ascending" style="width: 104.969px;">
-                            Address
-                        </th>
-                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-label="Country: activate to sort column ascending" style="width: 104.969px;">
-                            Create Date
-                        </th>
-                         <th class="no-sort sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" aria-label="Action: activate to sort column ascending" style="width: 172.078px;">
-                            Action
-                        </th>
-                      </tr>
-                   </thead>
-                   <tbody>
-                    {% for customer in customers %}
-                      <tr class="odd" id="table{{customer.id}}" data-booking_id="{{customer.id}}">
-                         <td class="customer_id">
-                            #{{customer.id}}
-                         </td>
-                         <td class="customer_name">{{customer.name}}</td>
-                         <td class="customer_email">
-                            {% if customer.email %}
-                                {{customer.email}} 
-                            {% else %}
-                                --
-                            {% endif %}
-                         </td>
-                         <td class="customer_number">{{customer.number}} </td>
-                         <td class="customer_nid">
-                            {% if customer.nid %}
-                                {{customer.nid}} 
-                            {% else %}
-                                --
-                            {% endif %}
-                         </td>
-                         <td class="customer_address">{{customer.address}}</td>
-                         <td>{{customer.date_created|date:"d M Y"}}</td>
-                         <td class="action-table-data" data-booking_id="{{customer.id}}">
-                            <div class="edit-delete-action" data-booking_id="{{customer.id}}">
-                               
-                               <a class="me-2 p-2 customer_edit_btn" href="#" data-bs-toggle="modal" data-bs-target="#edit-units" >
-                                    <input type="hidden" value="{{customer.id}}">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit">
-                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                  </svg>
-                               </a>
-                               
-                               <a class="delete-customer p-2" href="javascript:void(0);" data-booking_id="{{customer.id}}">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2">
-                                     <polyline points="3 6 5 6 21 6"></polyline>
-                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                     <line x1="10" y1="11" x2="10" y2="17"></line>
-                                     <line x1="14" y1="11" x2="14" y2="17"></line>
-                                  </svg>
-                               </a>
-                            </div>
-                         </td>
-                      </tr>
-                    {% endfor %}
+                <div class="search-path">
+                    <div class="d-flex align-items-center">
+                        <a class="btn btn-filter">
+                            <i data-feather="filter" class="filter-icon"></i>
+                            <span><img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/icons/closes.svg" alt="img"></span>
+                        </a>
+                        
+                    </div>
                     
-                   </tbody>
+                </div>
+                <!-- <div class="form-sort">
+                    <div class="input-blocks">
+                        <div class="input-groupicon calender-input">
+                            <i data-feather="sliders" class="info-img"></i>
+                            <input type="text" placeholder="Filter by year" style="margin-left: 5px;">
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table  datanew" id="booking-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>NID</th>
+                            <th>Address</th>
+                            <th>Create Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sales-list">
+                        {% for customer in customers %}
+                        <tr id="table{{customer.id}}" data-booking_id="{{customer.id}}">
+                            <td class="customer_id">
+                               #{{customer.id}}
+                            </td>
+                            <td class="customer_name">{{customer.name}}</td>
+                            <td class="customer_email">
+                               {% if customer.email %}
+                                   {{customer.email}} 
+                               {% else %}
+                                   --
+                               {% endif %}
+                            </td>
+                            <td class="customer_number">{{customer.number}} </td>
+                            <td class="customer_nid">
+                               {% if customer.nid %}
+                                   {{customer.nid}} 
+                               {% else %}
+                                   --
+                               {% endif %}
+                            </td>
+                            <td class="customer_address">{{customer.address}}</td>
+                            <td>{{customer.date_created|date:"d M Y"}}</td>
+                            <td class="action-table-data" data-booking_id="{{customer.id}}">
+                               <div class="edit-delete-action" data-booking_id="{{customer.id}}">
+                                  
+                                  <a class="me-2 p-2 customer_edit_btn" href="#" data-bs-toggle="modal" data-bs-target="#edit-units" >
+                                       <input type="hidden" value="{{customer.id}}">
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                     </svg>
+                                  </a>
+                                  
+                                  <a class="delete-customer p-2" href="javascript:void(0);" data-booking_id="{{customer.id}}">
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                     </svg>
+                                  </a>
+                               </div>
+                            </td>
+                         </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
-                <!-- <div class="dataTables_length" id="DataTables_Table_0_length"><label><select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select form-select-sm"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label></div><div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="DataTables_Table_0_previous"><a aria-controls="DataTables_Table_0" aria-disabled="true" role="link" data-dt-idx="previous" tabindex="-1" class="page-link"><i class="fa fa-angle-left"></i> </a></li><li class="paginate_button page-item active"><a href="#" aria-controls="DataTables_Table_0" role="link" aria-current="page" data-dt-idx="0" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item next disabled" id="DataTables_Table_0_next"><a aria-controls="DataTables_Table_0" aria-disabled="true" role="link" data-dt-idx="next" tabindex="-1" class="page-link"> <i class=" fa fa-angle-right"></i></a></li></ul></div><div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">1 - 10 of 10 items</div></div> -->
-             </div>
-          </div>
-       </div>
-       <!-- /product list -->
+            </div>
+        </div>
     </div>
+    <!-- /product list -->
 
     {% csrf_token %}
 
@@ -450,7 +433,7 @@
 
         setTimeout(()=>{
             edit_msg.textContent = "";
-            import_form.querySelector('button[type=submit]').disabled = false;
+            edit_form.querySelector('button[type=submit]').disabled = false;
         },7000)
     });
 

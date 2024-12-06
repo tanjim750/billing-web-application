@@ -32,11 +32,14 @@ class SalesListView(LoginRequiredMixin,View):
 
         self.bookings = models.Booking.objects.all()
         self.customers = models.Customer.objects.all()
+        logo = models.Logo.objects.first()
         self.context = {
             "customers": self.customers,
             "logo":{
-                "logo": models.Logo.objects.first(),
-                "id": models.Logo.objects.first().id
+                "normal": logo.normal.url if logo is not None else None,
+                "white": logo.normal.url if logo is not None else None,
+                "small": logo.normal.url if logo is not None else None,
+                "id": logo.id if logo is not None else None
             }
         }
 
@@ -59,6 +62,18 @@ class SalesListView(LoginRequiredMixin,View):
                     all_bookings.append(dict)
 
                 return JsonResponse(all_bookings,safe=False, status=200)
+            elif booking == "recent":
+                now = datetime.now()
+                month = now.month
+                year = now.year
+
+                resent = models.Booking.objects.filter(
+                    last_payment_date__month=month,
+                    last_payment_date__year=year
+                )
+
+                self.context['bookings'] = resent
+                return render(request, 'Admin/sales-list.html', context=self.context,status=200)
             
             else:
                 get_booking = models.Booking.objects.filter(id=booking)
@@ -450,7 +465,7 @@ class MakePayment(LoginRequiredMixin, View):
                         amount = monthly_payment
                     ).save()
                 
-                booking.last_payment_date = date
+                booking.last_payment_date = datetime.now()
                 booking.total_paid +=amount
                 booking.save()
 
@@ -527,10 +542,13 @@ class Customer(LoginRequiredMixin, View):
         self.redirect_field_name = 'next'
 
         self.customers = models.Customer.objects.all().order_by('date_created')
+        logo = models.Logo.objects.first()
         self.context = {
             "logo":{
-                "logo": models.Logo.objects.first(),
-                "id": models.Logo.objects.first().id
+                "normal": logo.normal.url if logo is not None else None,
+                "white": logo.normal.url if logo is not None else None,
+                "small": logo.normal.url if logo is not None else None,
+                "id": logo.id if logo is not None else None
             }
         }
 
@@ -608,6 +626,7 @@ class Customer(LoginRequiredMixin, View):
                 return JsonResponse(self.context, status=400)
             
         except Exception as e:
+
             self.context['status'] = 501
             self.context['message'] = 'Internal Server Error'
             self.context['error'] = str(e)

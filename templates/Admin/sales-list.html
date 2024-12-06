@@ -8,8 +8,8 @@
     <div class="page-header">
         <div class="add-item d-flex">
             <div class="page-title">
-                <h4>Booking List</h4>
-                <h6>Manage Your Bookings</h6>
+                <h4>Rent List</h4>
+                <h6>Manage Your Rent</h6>
             </div>
         </div>
         <ul class="table-top-head">
@@ -102,7 +102,7 @@
                                 &nbsp;&nbsp;#{{booking.customer.id}}
                             </td>
                             <td>{{booking.customer.name}}</td>
-                            <td>{{booking.shop}}</td>
+                            <td>shop-{{booking.shop}}</td>
                             <td>{{booking.rent_start_date|date:"d M Y"}}</td>
                             <td>{{booking.advance_payment}}</td>
                             <td>{{booking.monthly_rent}}</td>
