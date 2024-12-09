@@ -13,26 +13,26 @@
         </title>
 		
 		<!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="https://dreamspos.dreamstechnologies.com/html/template/assets/img/favicon.png">
+        <link rel="shortcut icon" type="image/x-icon" href="{{logo.icon}}">
 		
 		<!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://dreamspos.dreamstechnologies.com/html/template/assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
 		
 		<!-- animation CSS -->
-        <link rel="stylesheet" href="https://dreamspos.dreamstechnologies.com/html/template/assets/css/animate.css">
+        <link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
 
 		<!-- Select2 CSS -->
-		<link rel="stylesheet" href="https://dreamspos.dreamstechnologies.com/html/template/assets/plugins/select2/css/select2.min.css">
+		<link rel="stylesheet" href="{% static 'assets/plugins/select2/css/select2.min.css' %}">
 
 		<!-- Datetimepicker CSS -->
-		<link rel="stylesheet" href="https://dreamspos.dreamstechnologies.com/html/template/assets/css/bootstrap-datetimepicker.min.css">
+		<link rel="stylesheet" href="{% static 'assets/css/bootstrap-datetimepicker.min.css' %}">
 
 		<!-- Datatable CSS -->
-		<link rel="stylesheet" href="https://dreamspos.dreamstechnologies.com/html/template/assets/css/dataTables.bootstrap5.min.css">
+		<link rel="stylesheet" href="{% static 'assets/css/dataTables.bootstrap5.min.css' %}">
 		
         <!-- Fontawesome CSS -->
-		<link rel="stylesheet" href="https://dreamspos.dreamstechnologies.com/html/template/assets/plugins/fontawesome/css/fontawesome.min.css">
-		<link rel="stylesheet" href="https://dreamspos.dreamstechnologies.com/html/template/assets/plugins/fontawesome/css/all.min.css">
+		<link rel="stylesheet" href="{% static 'assets/plugins/fontawesome/css/fontawesome.min.css' %}">
+		<link rel="stylesheet" href="{% static 'assets/plugins/fontawesome/css/all.min.css' %}">
 		
 		<!-- Main CSS -->
         <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
@@ -78,6 +78,92 @@
 
 				<!-- Header Menu -->
 				<ul class="nav user-menu">
+					<!-- Search -->
+					<li class="nav-item nav-searchinputs">
+						<div class="top-nav-search">
+							<a href="javascript:void(0);" class="responsive-search">
+								<i class="fa fa-search"></i>
+							</a>
+							<form action="sales-list.html#" class="dropdown">
+								<div class="searchinputs dropdown-toggle" id="dropdownMenuClickable" data-bs-toggle="dropdown" data-bs-auto-close="false">
+									<!-- <input type="text" placeholder="Search"> -->
+									<div class="search-addon">
+										<span><i data-feather="x-circle" class="feather-14"></i></span>
+									</div>
+								</div>
+								<div class="dropdown-menu search-dropdown" aria-labelledby="dropdownMenuClickable">
+									<div class="search-info">
+										<h6><span><i data-feather="search" class="feather-16"></i></span>Recent Searches
+										</h6>
+										<ul class="search-tags">
+											<li><a href="javascript:void(0);">Products</a></li>
+											<li><a href="javascript:void(0);">Sales</a></li>
+											<li><a href="javascript:void(0);">Applications</a></li>
+										</ul>
+									</div>
+									<div class="search-info">
+										<h6><span><i data-feather="help-circle" class="feather-16"></i></span>Help</h6>
+										<p>How to Change Product Volume from 0 to 200 on Inventory management</p>
+										<p>Change Product Name</p>
+									</div>
+									<div class="search-info">
+										<h6><span><i data-feather="user" class="feather-16"></i></span>Customers</h6>
+										<ul class="customers">
+											<li><a href="javascript:void(0);">Aron Varu<img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/profiles/avator1.jpg" alt="" class="img-fluid"></a></li>
+											<li><a href="javascript:void(0);">Jonita<img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/profiles/avatar-01.jpg" alt="" class="img-fluid"></a></li>
+											<li><a href="javascript:void(0);">Aaron<img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/profiles/avatar-10.jpg" alt="" class="img-fluid"></a></li>
+										</ul>
+									</div>
+								</div>
+							</form>
+						</div>
+					</li>
+					<!-- /Search -->
+					 
+					<li class="nav-item nav-item-box">
+						<a href="javascript:void(0);" id="btnFullscreen">
+							<i data-feather="maximize"></i>
+						</a>
+					</li>
+				
+
+					<li class="nav-item nav-item-box">
+						<a  target="_blank"href="{% url 'admin:auth_user_change' request.user.id %}"><i data-feather="settings"></i></a>
+					</li>
+					<li class="nav-item dropdown has-arrow main-drop">
+						<a href="javascript:void(0);" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
+							<span class="user-info">
+								<span class="user-letter">
+									<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtuphMb4mq-EcVWhMVT8FCkv5dqZGgvn_QiA&s" alt="" class="img-fluid">
+								</span>
+								<span class="user-detail">
+									<span class="user-name">{{request.user.first_name}} {{request.user.last_name}}</span>
+									<span class="user-role">Management</span>
+								</span>
+							</span>
+						</a>
+						<div class="dropdown-menu menu-drop-user">
+							<div class="profilename">
+								<div class="profileset">
+									<span class="user-img"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtuphMb4mq-EcVWhMVT8FCkv5dqZGgvn_QiA&s" alt="">
+										<span class="status online"></span></span>
+									<div class="profilesets">
+										<h6>{{request.user.first_name}} {{request.user.last_name}}</h6>
+										<h5>Management</h5>
+									</div>
+								</div>
+								<hr class="m-0">
+								<a class="dropdown-item" target="_blank" href="{% url 'admin:auth_user_change' request.user.id %}"> <i class="me-2" data-feather="user"></i> My
+									Profile</a>
+								
+								<hr class="m-0">
+								<a class="dropdown-item logout pb-0" href="{% url 'logout' %}"><img
+										src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/icons/log-out.svg" class="me-2" alt="img">Logout</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<!-- /Header Menu -->
 
 					<!-- Search -->
 						<li class="nav-item nav-searchinputs">
@@ -121,52 +207,6 @@
 						</li>
 						<!-- /Search -->
 
-
-					<li class="nav-item nav-item-box">
-						<a href="javascript:void(0);" id="btnFullscreen">
-							<i data-feather="maximize"></i>
-						</a>
-					</li>
-				
-
-					<li class="nav-item nav-item-box">
-						<a  target="_blank"href="{% url 'admin:auth_user_change' request.user.id %}"><i data-feather="settings"></i></a>
-					</li>
-					<li class="nav-item dropdown has-arrow main-drop">
-						<a href="javascript:void(0);" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
-							<span class="user-info">
-								<span class="user-letter">
-									<img src="{% static '/asset/img/user-img.png' %}" alt="" class="img-fluid">
-								</span>
-								<span class="user-detail">
-									<span class="user-name">{{request.user.first_name}} {{request.user.last_name}}</span>
-									<span class="user-role">Management</span>
-								</span>
-							</span>
-						</a>
-						<div class="dropdown-menu menu-drop-user">
-							<div class="profilename">
-								<div class="profileset">
-									<span class="user-img"><img src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/profiles/avator1.jpg" alt="">
-										<span class="status online"></span></span>
-									<div class="profilesets">
-										<h6>{{request.user.first_name}} {{request.user.last_name}}</h6>
-										<h5>Management</h5>
-									</div>
-								</div>
-								<hr class="m-0">
-								<a class="dropdown-item" target="_blank" href="{% url 'admin:auth_user_change' request.user.id %}"> <i class="me-2" data-feather="user"></i> My
-									Profile</a>
-								
-								<hr class="m-0">
-								<a class="dropdown-item logout pb-0" href="{% url 'logout' %}"><img
-										src="https://dreamspos.dreamstechnologies.com/html/template/assets/img/icons/log-out.svg" class="me-2" alt="img">Logout</a>
-							</div>
-						</div>
-					</li>
-				</ul>
-				<!-- /Header Menu -->
-
 				<!-- Mobile Menu -->
 				<div class="dropdown mobile-user-menu">
 					<a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
@@ -192,28 +232,28 @@
 								<ul>
 									<li><a href="/">
 										<i data-feather="box"></i>
-										<span>Dashboard</span><span class="menu-arrow"></span>
+										<span>Dashboard</span>
 									</a></li>
 									<li><a href="{% url 'customer-list' %}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                        <span>Customer</span><span class="menu-arrow"></span>
+                                        <span>Customer</span>
 									</a></li>
 									<li><a href="{% url 'booking-list' %}">
 										<i data-feather="codesandbox"></i>
-										<span>Rent List</span><span class="menu-arrow"></span>
+										<span>Rent List</span>
 									</a></li>
 									<li><a href="{% url 'booking-list' %}?booking=recent">
 										<i data-feather="codesandbox"></i>
-										<span>Recent Rent</span><span class="menu-arrow"></span>
+										<span>Recent Rent</span>
 									</a></li>
 									<li><a target="_blank" href="{% url 'admin:auth_user_add' %}">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-										<span>Add Manager</span><span class="menu-arrow"></span>
+										<span>Add Manager</span>
 									</a></li>
 									<li>
 										<a href="{% url 'admin:Admin_logo_change' logo.id %}" target="_blank">
 											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-hexagon"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-											<span>Upload Logo</span><span class="menu-arrow"></span>
+											<span>Upload Logo</span>
 										</a>
 									</li>
 								</ul>
@@ -1742,53 +1782,41 @@
 				</div>
 			</div>
 		</div>
-		<!-- edit payment Modal -->
-		<div class="customizer-links" id="setdata">
-			<ul class="sticky-sidebar">
-				<li class="sidebar-icons">
-					<a href="sales-list.html#" class="navigation-add" data-bs-toggle="tooltip" data-bs-placement="left"
-						data-bs-original-title="Theme">
-						<i data-feather="settings" class="feather-five"></i>
-					</a>
-				</li>
-			</ul>
-		</div>
 
         {% block model %}{% endblock %}
         {% block script %}{% endblock %} 
 		<!-- jQuery -->
-        <script data-cfasync="false" src="https://dreamspos.dreamstechnologies.com/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/jquery-3.7.1.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+        <script data-cfasync="false" src="{% static 'assets/js/email-decode.min.js' %}"></script>
+		<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
 
         <!-- Feather Icon JS -->
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/feather.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<script src="{% static 'assets/js/feather.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
 
 		<!-- Slimscroll JS -->
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/jquery.slimscroll.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<script src="{% static 'assets/js/jquery.slimscroll.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
 
 		<!-- Datatable JS -->
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/jquery.dataTables.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/dataTables.bootstrap5.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<script src="{% static 'assets/js/jquery.dataTables.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<script src="{% static 'assets/js/dataTables.bootstrap5.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
 		
 		<!-- Bootstrap Core JS -->
-        <script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/bootstrap.bundle.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
-
-		<!-- Select2 JS -->
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/plugins/select2/js/select2.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
 
 		<!-- Datetimepicker JS -->
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/moment.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/bootstrap-datetimepicker.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<script src="{% static 'assets/js/moment.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<script src="{% static 'assets/js/bootstrap-datetimepicker.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
 
 		<!-- Sweetalert 2 -->
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/plugins/sweetalert/sweetalert2.all.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/plugins/sweetalert/sweetalerts.min.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<script src="{% static 'assets/js/sweetalert2.all.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<script src="{% static 'assets/js/sweetalerts.min.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
 
-		<!-- Custom JS --><script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/theme-script.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>	
-		<script src="https://dreamspos.dreamstechnologies.com/html/template/assets/js/script.js" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
+		<!-- Custom JS --><script src="{% static 'assets/js/theme-script.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>	
+		<script src="{% static 'assets/js/script.js' %}" type="20eddcc3492b1ed460052fd7-text/javascript"></script>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
 
-    <script src="https://dreamspos.dreamstechnologies.com/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="20eddcc3492b1ed460052fd7-|49" defer></script></body>
+    <script src="{% static 'assets/js/rocket-loader.min.js' %}" data-cf-settings="20eddcc3492b1ed460052fd7-|49" defer></script>
+</body>
 </html>

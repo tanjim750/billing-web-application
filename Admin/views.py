@@ -37,8 +37,9 @@ class SalesListView(LoginRequiredMixin,View):
             "customers": self.customers,
             "logo":{
                 "normal": logo.normal.url if logo is not None else None,
-                "white": logo.normal.url if logo is not None else None,
-                "small": logo.normal.url if logo is not None else None,
+                "white": logo.white.url if logo is not None else None,
+                "small": logo.small.url if logo is not None else None,
+                "icon": logo.icon.url if logo is not None else None,
                 "id": logo.id if logo is not None else None
             }
         }
@@ -546,8 +547,9 @@ class Customer(LoginRequiredMixin, View):
         self.context = {
             "logo":{
                 "normal": logo.normal.url if logo is not None else None,
-                "white": logo.normal.url if logo is not None else None,
-                "small": logo.normal.url if logo is not None else None,
+                "white": logo.white.url if logo is not None else None,
+                "small": logo.small.url if logo is not None else None,
+                "icon": logo.icon.url if logo is not None else None,
                 "id": logo.id if logo is not None else None
             }
         }

@@ -60,5 +60,6 @@ class Logo(models.Model):
     normal = models.FileField(upload_to="logo")
     white = models.FileField(upload_to="logo")
     small = models.FileField(upload_to="logo")
+    icon = models.FileField(upload_to="logo",null=True)
 
     
