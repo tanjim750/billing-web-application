@@ -28,7 +28,8 @@ ALLOWED_HOSTS = ["royalplazaesrarmarket.vercel.app",
                  "www.royalplazaesrarmarket.vercel.app",
                  ".vercel.app",
                  "royalplazaesrarmarket.com",
-                 "www.royalplazaesrarmarket.com"]
+                 "www.royalplazaesrarmarket.com",
+                 "127.0.0.1"]
 
 
 # Application definition
@@ -122,7 +123,7 @@ USE_TZ = True
 
 # Static files configuration
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Correct directory for collected files
+STATIC_ROOT = os.path.join(BASE_DIR,"staticfiles", 'static')  # Correct directory for collected files
 
 # Media files configuration
 MEDIA_URL = '/media/'  # This was '/contents/' before — better to use '/media/'
