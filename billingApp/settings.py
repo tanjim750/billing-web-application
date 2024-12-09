@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,7 +24,11 @@ SECRET_KEY = 'django-insecure-wgaiqiwe8o78t9wv8p^cz&ct=hio848l!oj!afyqyx7%%8#yrp
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ["royalplazaesrarmarket.vercel.app","www.royalplazaesrarmarket.vercel.app",".vercel.app"]
+ALLOWED_HOSTS = ["royalplazaesrarmarket.vercel.app",
+                 "www.royalplazaesrarmarket.vercel.app",
+                 ".vercel.app",
+                 "royalplazaesrarmarket.com",
+                 "www.royalplazaesrarmarket.com"]
 
 
 # Application definition
@@ -116,10 +120,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+# Static files configuration
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Correct directory for collected files
 
-MEDIA_URL = '/contents/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Media files configuration
+MEDIA_URL = '/media/'  # This was '/contents/' before — better to use '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
