@@ -13,7 +13,7 @@
         </title>
 		
 		<!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="{{logo.icon}}">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/img/logo.jpeg' %}">
 		
 		<!-- Bootstrap CSS -->
         <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
@@ -54,13 +54,13 @@
 				<!-- Logo -->
 				<div class="header-left active">
 					<a href="/" class="logo logo-normal">
-						<img src="{{logo.normal}}" alt="">
+						<img src="{% static 'assets/img/logo.jpeg' %}" alt="">
 					</a>
 					<a href="/" class="logo logo-white">
-						<img src="{{logo..white}}" alt="">
+						<img src="{% static 'assets/img/logo.jpeg' %}" alt="">
 					</a>
 					<a href="/" class="logo-small">
-						<img src="{{logo.small}}" alt="">
+						<img src="{% static 'assets/img/logo.jpeg' %}" alt="">
 					</a>
 					<a id="toggle_btn" href="javascript:void(0);">
 						<i data-feather="chevrons-left" class="feather-16"></i>
@@ -250,12 +250,12 @@
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
 										<span>Add Manager</span>
 									</a></li>
-									<li>
+									<!-- <li>
 										<a href="{% url 'admin:Admin_logo_change' logo.id %}" target="_blank">
 											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-hexagon"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
 											<span>Upload Logo</span>
 										</a>
-									</li>
+									</li> -->
 								</ul>
 							</li>
 						</ul>
