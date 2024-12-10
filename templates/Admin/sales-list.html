@@ -287,7 +287,7 @@
         jsonData = Object.fromEntries(formData.entries()); 
         
         try{
-            let url = "/booking";
+            let url = "{% url 'new-booking' %}";
             let response = await fetch(url,{
                 method: 'POST',
                 headers: {
