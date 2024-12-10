@@ -7,5 +7,5 @@ python3 manage.py makemigrations
 python3 manage.py migrate
 # Run collectstatic to collect all static files
 python3 manage.py collectstatic --noinput --clear
-
+cp -r media staticfiles/media
 echo "BUILD END"
