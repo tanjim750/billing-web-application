@@ -85,7 +85,16 @@ WSGI_APPLICATION = 'billingApp.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'u747710383_j6oQp',
+        'USER': 'u747710383_xEPdo', 
+        'PASSWORD': 'Tradingtech2001', 
+        'HOST': '193.203.184.191',
+        'PORT': '3306',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
