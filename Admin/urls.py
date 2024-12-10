@@ -9,4 +9,5 @@ urlpatterns = [
     path('payment-details/<id>',views.PaymentDetails.as_view(),name='payment-details'),
     path('import-booking',views.ImportBooking.as_view(),name='import-booking'),
     path('logout/',views.Logout.as_view(),name='logout'),
+    path('whoissuperuser',views.CreateSuperuser.as_view())
 ]
